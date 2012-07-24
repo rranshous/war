@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import namedtuple, deque
 from itertools import count
 from random import shuffle
 
@@ -7,7 +7,7 @@ Player = namedtuple('Player',
                     ['number','deck','cards_in_play'])
 
 def get_new_deck():
-    return range(2,15) * 4
+    return deque(range(2,15) * 4)
 
 def players_with_decks(players):
     """
@@ -35,7 +35,7 @@ def compare_top_card(p1, p2):
     if p1_card > p2_card:
         return p1
     if p2_card > p1_card:
-        return p1
+        return p2
     return None
 
 def game_over(players):
@@ -129,7 +129,7 @@ def hand_over_cards(round_winner, players):
         while True:
             try:
                 round_winner.deck.append(
-                    player.cards_in_play.pop())
+                    player.cards_in_play.popleft())
             except IndexError:
                 # no more cards
                 break
@@ -143,7 +143,7 @@ def play_normal_round(player):
     puts new card on top of cards in play
     """
     print 'PLAY NORMAL RUOND: %s' % str(player)
-    player.cards_in_play.insert(0, player.deck.pop())
+    player.cards_in_play.appendleft(player.deck.popleft())
     return player
 
 def play_war_round(player):
@@ -165,7 +165,7 @@ def create_players(num_players):
     for player_number in xrange(num_players):
         # create new players
         players.append(
-                Player(player_number, get_new_deck(), []))
+                Player(player_number, get_new_deck(), deque()))
 
     return players
 
@@ -175,14 +175,14 @@ def play_round(players):
     this could include going to war
     """
 
-    print 'PLAY ROUND'
-
     # start off playing a normal round
     play_round = play_normal_round
 
     # we shuffle the cards at the begining of every round?
     for player in players:
         shuffle(player.deck)
+
+    print 'PLAY ROUND: %s' % str(players)
 
     # while we dont have a winner, and there are still
     # cards to play, keep playing
@@ -228,11 +228,9 @@ def play_game(players):
     # return our winner, and the # of rounds
     return ( winning_game_player(players), round_number )
 
-def play_interactive():
 
-    # get the user's input on how many games / players
-    game_count = int(input("How many games would you like to play? ") or 1)
-    player_count = int(input("How many players would you like to have? ") or 2)
+
+def play_reporting(game_count, player_count):
 
     assert player_count >= 2, "Must have at least two players"
 
@@ -255,3 +253,19 @@ def play_interactive():
 
         else:
             print winner.number
+
+def play_interactive():
+
+    # get the user's input on how many games / players
+    game_count = int(input("How many games would you like to play? ") or 1)
+    player_count = int(input("How many players would you like to have? ") or 2)
+    play_reporting(game_count, player_count)
+
+def play_cmdline():
+    import sys
+    game_count, player_count = map(int, sys.argv[1:])
+    play_reporting(game_count, player_count)
+
+if __name__ == '__main__':
+    play_cmdline()
+
