@@ -30,8 +30,6 @@ def compare_top_card(p1, p2):
     p1_card = p1.cards_in_play[0]
     p2_card = p2.cards_in_play[0]
 
-    print 'COMPARE TOP CARD: %s %s' % (p1_card, p2_card)
-
     if p1_card > p2_card:
         return p1
     if p2_card > p1_card:
@@ -45,12 +43,9 @@ def game_over(players):
 
     return bool
     """
-    print 'CHECKING GAME OVER',
     active_players = players_with_decks(players)
     if not active_players or len(active_players) == 1:
-        print 'OVER'
         return True
-    print 'NOT'
     return False
 
 def winning_game_player(players):
@@ -62,12 +57,9 @@ def winning_game_player(players):
     returns None if game is not over
     """
 
-    print 'WINNING GAME PLAYER'
-
     # in order for there to be a winner, the game must
     # be over
     if not game_over(players):
-        print 'GAME NOT OVER'
         return None
 
     # if the game is over, it could be that there is no
@@ -87,8 +79,6 @@ def winning_round_player(players):
 
     assert players, "Must have players to determine winner"
 
-    print 'WINNING ROUND PLAYER'
-
     # a winner player is defined as the player
     # with the highest top card
     top = None
@@ -96,8 +86,6 @@ def winning_round_player(players):
 
         # only compare if the player has something to compare
         if not player.cards_in_play: continue
-
-        print 'player: %s' % str(player)
 
         # if top isn't set, we'll go with current
         if not top:
@@ -108,10 +96,8 @@ def winning_round_player(players):
 
     # if it's a tie, no winner
     if top is None:
-        print 'TIE'
         return False
 
-    print 'top: %s' % str(top)
     return top
 
 def hand_over_cards(round_winner, players):
@@ -119,8 +105,6 @@ def hand_over_cards(round_winner, players):
     consolidate's all the cards that were in play
     into the winner's deck
     """
-
-    print 'HANDING OVER CARDS: %s' % str(round_winner)
 
     # go through each of the players
     for player in players:
@@ -142,7 +126,6 @@ def play_normal_round(player):
     normal round moves one card off deck and into play
     puts new card on top of cards in play
     """
-    print 'PLAY NORMAL RUOND: %s' % str(player)
     player.cards_in_play.appendleft(player.deck.popleft())
     return player
 
@@ -150,7 +133,6 @@ def play_war_round(player):
     """
     war round moves four cards off deck and into play
     """
-    print 'PLAY WAR ROUND: %s' % str(player)
     for i in xrange(4):
         play_normal_round(player)
 
@@ -162,7 +144,7 @@ def create_players(num_players):
     with decks
     """
     players = []
-    for player_number in xrange(num_players):
+    for player_number in xrange(1,num_players+1):
         # create new players
         players.append(
                 Player(player_number, get_new_deck(), deque()))
@@ -181,8 +163,6 @@ def play_round(players):
     # we shuffle the cards at the begining of every round?
     for player in players:
         shuffle(player.deck)
-
-    print 'PLAY ROUND: %s' % str(players)
 
     # while we dont have a winner, and there are still
     # cards to play, keep playing
@@ -211,12 +191,8 @@ def play_round(players):
 
 def play_game(players):
 
-    print "PLAY GAME: %s" % str(players)
-
     # infinite number of rounds, starting @ 1
     for round_number in count(1):
-
-        print "ROUND: %s" % round_number
 
         # play our players through the next round
         play_round(players)
@@ -239,10 +215,6 @@ def play_reporting(game_count, player_count):
 
         players = create_players(player_count)
         winner, rounds = play_game(players)
-
-        print 'WINNER: %s' % str(winner)
-        print 'ROUNDS: %s' % str(rounds)
-        print 'PLAYERS: %s' % str(players)
 
         # start reporting
         print ('Game [%s] (%s)' % (game_number, rounds)),
